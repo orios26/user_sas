@@ -58,7 +58,7 @@ content_language = ""
 content_length = ""
 content_md5 = ""
 content_type = "application/json"
-date = request_date
+date = ""
 if_modified_since = ""
 if_match = ""
 if_none_match = ""
@@ -69,7 +69,7 @@ range = ""
 VERB = "GET"
 azure_request_headers = {
     "x-ms-date": request_date,
-    "x-ms-version": "2020-02-10",
+    "x-ms-version": "2015-12-11",
     "Content-Type": content_type,
     "Accept": "application/json"
 }
@@ -91,10 +91,18 @@ bytes_to_hash = bytes(stringToSign, encoding='utf-8')
 decoded_key = base64.b64decode(delegated_key)
 signature = base64.b64encode(
     hmac.new(decoded_key, bytes_to_hash, digestmod=hashlib.sha256).digest())
-auth_header = f"SharedKey otiorgdatalake:{signature.decode('utf-8').replace('+', '%2B')}"
+auth_header = f"SharedKey otiorgdatalake:{signature.decode('utf-8')}"
 azure_request_headers["Authorization"] = auth_header
 
 
 azure_request = requests.request(
     VERB, headers=azure_request_headers, url=azure_request_url)
+print("headers sent:")
+print(azure_request.request.method)
+print(azure_request.request.headers)
+print(azure_request.request.body)
+
+
 print(azure_request.status_code)
+print(azure_request.content)
+print(stringToSign)
