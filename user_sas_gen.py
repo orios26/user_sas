@@ -6,22 +6,30 @@ from urllib.parse import unquote
 from collections import OrderedDict
 
 
-URL = "https://otiorgdatalake.blob.core.windows.net/raw/123Directory/newdata"
-split = URL.replace("https://", "").split("/")
-account_name = split[0].split(".")[0]
-canonicalizedResourceOriginal = f"/blob/{account_name}/{'/'.join(split[1:-1])}"
-canonicalDecode = unquote(canonicalizedResourceOriginal)
+def createCanonicalizedResource(resource_URI):
+    remove_https = resource_URI.replace("https://", "")
+    account_name = remove_https.split('.')[0]
+    resource_path = remove_https.split('.')[-1].split('/')[1:]
+    canonicalizedString = f"/blob/{account_name}/{'/'.join(resource_path)}"
+    canonicalizedResource = unquote(canonicalizedString)
+    return canonicalizedResource
+
+
+URL = ""
+# RESOURCE URI OF FOLDER/BLOB/CONTAINER TO GIVE ACCESS TO
+# EXAMPLE: https://storageaccountname.blob.core.windows.net/raw/123Directory/newdata
+canonicalDecode = createCanonicalizedResource(URL)
 print(canonicalDecode)
 
 
-signedPermissions = "r"
-signedStart = "2022-04-20T19:41:21Z"
-signedExpiry = "2022-04-21T19:41:21Z"
+signedPermissions = "rw"
+signedStart = "2022-05-31T01:03:12Z"
+signedExpiry = "2022-06-01T01:03:12Z"
 canonicalizedResource = canonicalDecode
-signedKeyObjectId = ""
-signedKeyTenantId = ""
-signedKeyStart = "2022-04-19T01:03:12Z"
-signedKeyExpiry = "2022-04-24T01:03:12Z"
+signedKeyObjectId = ""  # SignedOid returned from get user delegation key call
+signedKeyTenantId = ""  # SignedTid returned from get user delegation key call
+signedKeyStart = "2022-05-31T01:03:12Z"
+signedKeyExpiry = "2022-06-01T01:03:12Z"
 signedKeyService = "b"
 signedKeyVersion = "2020-02-10"
 signedAuthorizedUserObjectId = ""
@@ -39,7 +47,7 @@ rscl = ""
 rsct = ""
 
 
-delegated_key = ""
+delegated_key = ""  # user delegation key returned from api call
 stringToSign = signedPermissions + "\n" + signedStart + "\n" + signedExpiry + "\n" + canonicalizedResource + "\n" + signedKeyObjectId + "\n" + signedKeyTenantId + "\n" + signedKeyStart + "\n" + signedKeyExpiry + "\n" + signedKeyService + "\n" + signedKeyVersion + "\n" + \
     signedAuthorizedUserObjectId + "\n" + signedUnauthorizedUserObjectId + "\n" + signedCorrelationId + "\n" + signedIP + "\n" + signedProtocol + "\n" + \
     signedVersion + "\n" + signedResource + "\n" + signedSnapshotTime + "\n" + \
@@ -67,5 +75,6 @@ def generate_user_delegation_sas(sas_config):
 
 
 token_starter = generate_user_delegation_sas(sas_config=sas_config)
-full_token = token_starter + "sig=" + signature.decode('utf-8')
+full_token = token_starter + "sig=" + \
+    signature.decode('utf-8').replace("+", "%2B")
 print(full_token)
