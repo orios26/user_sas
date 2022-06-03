@@ -18,23 +18,23 @@ def createCanonicalizedResource(resource_URI):
 
 # RESOURCE URI OF FOLDER/BLOB/CONTAINER TO GIVE ACCESS TO
 # EXAMPLE: https://storageaccountname.blob.core.windows.net/raw/123Directory/newdata
-URL = "https://myaccount.blob.core.windows.net/music/intro.mp3"
+URL = "https://fr.txt"
 canonicalDecode = createCanonicalizedResource(URL)
 print(canonicalDecode)
 
 
 signedPermissions = "rw"
-signedStart = "2022-06-01T01:03:12Z"
-signedExpiry = "2022-06-07T01:03:12Z"
+signedStart = "2022-06-03T08:02:55Z"
+signedExpiry = "2022-06-04T09:02:55Z"
 canonicalizedResource = canonicalDecode
 # SignedOid returned from get user delegation key call
 signedKeyObjectId = ""
 # SignedTid returned from get user delegation key call
 signedKeyTenantId = ""
 # SignedStart returned from get user delegation key call
-signedKeyStart = "2022-06-01T01:03:12Z"
+signedKeyStart = "2022-06-03T08:02:55Z"
 # SignedExpiry returned from get user delegation key call
-signedKeyExpiry = "2022-06-07T01:03:12Z"
+signedKeyExpiry = "2022-06-04T09:02:55Z"
 # SignedService returned from get user dedlgation key call
 signedKeyService = "b"
 # SignedVersion returned from get user delegation key call
@@ -47,19 +47,40 @@ signedProtocol = "https"
 signedVersion = "2020-02-10"
 signedResource = "b"
 signedSnapshotTime = ""
-signedEncryptionScope = ""
-rscc = ""
-rsdd = ""
-rscl = ""
-rsct = ""
+signedRscc = ""
+signedRscd = ""
+signedRsce = ""
+signedRscl = ""
+signedRsct = ""
 
 
 # user delegation key returned from api call
 delegated_key = ""
-stringToSign = signedPermissions + "\n" + signedStart + "\n" + signedExpiry + "\n" + canonicalizedResource + "\n" + signedKeyObjectId + "\n" + signedKeyTenantId + "\n" + signedKeyStart + "\n" + signedKeyExpiry + "\n" + signedKeyService + "\n" + signedKeyVersion + "\n" + \
-    signedAuthorizedUserObjectId + "\n" + signedUnauthorizedUserObjectId + "\n" + signedCorrelationId + "\n" + signedIP + "\n" + signedProtocol + "\n" + \
-    signedVersion + "\n" + signedResource + "\n" + signedSnapshotTime + "\n" + \
-    signedEncryptionScope + "\n" + rscc + "\n" + rsdd + "\n" + rscl + "\n" + rsct
+stringToSign = (
+    signedPermissions + "\n"
+ + signedStart + "\n" 
+ + signedExpiry + "\n" 
+ + canonicalizedResource + "\n" 
+ + signedKeyObjectId + "\n" 
+ + signedKeyTenantId + "\n" 
+ + signedKeyStart + "\n" 
+ + signedKeyExpiry + "\n" 
+ + signedKeyService + "\n" 
+ + signedKeyVersion + "\n" 
+ + signedAuthorizedUserObjectId + "\n" 
+ + signedUnauthorizedUserObjectId + "\n" 
+ + signedCorrelationId + "\n" 
+ + signedIP + "\n" 
+ + signedProtocol + "\n" 
+ + signedVersion + "\n" 
+ + signedResource + "\n" 
+ + signedSnapshotTime + "\n"  
+ + signedRscc + "\n" 
+ + signedRscd + "\n" 
+ + signedRsce + "\n" 
+ + signedRscl + "\n" )
+
+print(stringToSign)
 
 bytes_to_hash = bytes(stringToSign, encoding='utf-8')
 decoded_key = base64.b64decode(delegated_key)
@@ -68,7 +89,7 @@ signature = base64.b64encode(
 print(signature)
 
 # define sas config object from the values in string to sign
-sas_config = OrderedDict(sp=signedPermissions, st=signedStart, se=signedExpiry, skoid=signedKeyObjectId, sktid=signedKeyTenantId, skt=signedKeyStart, ske=signedKeyExpiry, sks=signedKeyService, skv=signedKeyVersion, saoid=signedAuthorizedUserObjectId, suoid=signedUnauthorizedUserObjectId, scid=signedCorrelationId, sip=signedIP, spr=signedProtocol, sv=signedVersion, sr=signedResource, ses=signedEncryptionScope
+sas_config = OrderedDict(sp=signedPermissions, st=signedStart, se=signedExpiry, skoid=signedKeyObjectId, sktid=signedKeyTenantId, skt=signedKeyStart, ske=signedKeyExpiry, sks=signedKeyService, skv=signedKeyVersion, saoid=signedAuthorizedUserObjectId, suoid=signedUnauthorizedUserObjectId, scid=signedCorrelationId, sip=signedIP, spr=signedProtocol, sv=signedVersion, sr=signedResource, rscc = signedRscc, rscd=signedRscd, rsce = signedRsce, rscl = signedRscl, rsct = signedRsct 
                          )
 
 
