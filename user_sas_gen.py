@@ -9,28 +9,35 @@ from collections import OrderedDict
 def createCanonicalizedResource(resource_URI):
     remove_https = resource_URI.replace("https://", "")
     account_name = remove_https.split('.')[0]
-    resource_path = remove_https.split('.')[-1].split('/')[1:]
-    canonicalizedString = f"/blob/{account_name}/{'/'.join(resource_path)}"
+    substring_template = remove_https.replace(".core.windows.net", "#")
+    resource_path = ''.join(substring_template.split("#")[1:])
+    canonicalizedString = f"/blob/{account_name}{resource_path}"
     canonicalizedResource = unquote(canonicalizedString)
     return canonicalizedResource
 
 
-URL = ""
 # RESOURCE URI OF FOLDER/BLOB/CONTAINER TO GIVE ACCESS TO
 # EXAMPLE: https://storageaccountname.blob.core.windows.net/raw/123Directory/newdata
+URL = "https://myaccount.blob.core.windows.net/music/intro.mp3"
 canonicalDecode = createCanonicalizedResource(URL)
 print(canonicalDecode)
 
 
 signedPermissions = "rw"
-signedStart = "2022-05-31T01:03:12Z"
-signedExpiry = "2022-06-01T01:03:12Z"
+signedStart = "2022-06-01T01:03:12Z"
+signedExpiry = "2022-06-07T01:03:12Z"
 canonicalizedResource = canonicalDecode
-signedKeyObjectId = ""  # SignedOid returned from get user delegation key call
-signedKeyTenantId = ""  # SignedTid returned from get user delegation key call
-signedKeyStart = "2022-05-31T01:03:12Z"
-signedKeyExpiry = "2022-06-01T01:03:12Z"
+# SignedOid returned from get user delegation key call
+signedKeyObjectId = ""
+# SignedTid returned from get user delegation key call
+signedKeyTenantId = ""
+# SignedStart returned from get user delegation key call
+signedKeyStart = "2022-06-01T01:03:12Z"
+# SignedExpiry returned from get user delegation key call
+signedKeyExpiry = "2022-06-07T01:03:12Z"
+# SignedService returned from get user dedlgation key call
 signedKeyService = "b"
+# SignedVersion returned from get user delegation key call
 signedKeyVersion = "2020-02-10"
 signedAuthorizedUserObjectId = ""
 signedUnauthorizedUserObjectId = ""
@@ -47,7 +54,8 @@ rscl = ""
 rsct = ""
 
 
-delegated_key = ""  # user delegation key returned from api call
+# user delegation key returned from api call
+delegated_key = ""
 stringToSign = signedPermissions + "\n" + signedStart + "\n" + signedExpiry + "\n" + canonicalizedResource + "\n" + signedKeyObjectId + "\n" + signedKeyTenantId + "\n" + signedKeyStart + "\n" + signedKeyExpiry + "\n" + signedKeyService + "\n" + signedKeyVersion + "\n" + \
     signedAuthorizedUserObjectId + "\n" + signedUnauthorizedUserObjectId + "\n" + signedCorrelationId + "\n" + signedIP + "\n" + signedProtocol + "\n" + \
     signedVersion + "\n" + signedResource + "\n" + signedSnapshotTime + "\n" + \
