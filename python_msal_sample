@@ -1,0 +1,45 @@
+from digital_certificate.cert import Certificate
+import sys
+import logging
+import requests
+import msal
+import cryptography
+
+# Press Shift+F10 to execute it or replace it with your code.
+# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+
+def attempt_auth():
+    client_id = ""
+    tenant_id = ""
+    authority = f"https://login.microsoftonline.com/{tenant_id}"
+    scopes = ["https://storage.azure.com/.default"]
+    thumbprint = "6B6F9FAC6FA319094BE18840DA05A27CABB882FD"
+    private_key_file = r"C:\Users\Otilio\Desktop\CBA_POC.pfx"
+    _cert= Certificate(
+        pfx_file=r"C:\Users\Otilio\Desktop\CBA_POC.pfx",
+        password=b"cbaCBA123!"
+    )
+
+    app = msal.ConfidentialClientApplication(
+        client_id,
+        authority=authority,
+        client_credential=_cert.read_pfx_file()
+                                             )
+    result = None
+
+    result = app.acquire_token_silent(scopes=scopes, account=None)
+
+    if not result:
+        logging.info("No suitable token exists in cache. Attempting to get a new one from AAD")
+        result = app.acquire_token_for_client(scopes=scopes)
+    if "access_token" in result:
+        logging.info("Token acquired. Printing now")
+        logging.info(result.access_token)
+    else:
+        print(result.get("error"))
+        print(result.get("error_description"))
+        print(result.get("correlation_id"))
+
+# Press the green button in the gutter to run the script.
+if __name__ == '__main__':
+    attempt_auth()
